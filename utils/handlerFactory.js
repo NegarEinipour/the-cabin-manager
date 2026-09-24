@@ -1,20 +1,22 @@
 const catchAsync = require("./catchAsync");
 const AppError = require("./AppError");
+const APIFeatures = require("../utils/apiFeatures");
 
 // GET ALL
-exports.getAll = (Model) => {
-  return catchAsync(async (req, res) => {
-    const docs = await Model.find();
+exports.getAll = (Model, populateOptions) =>
+  catchAsync(async (req, res, next) => {
+    let query = Model.find();
+
+    if (populateOptions) query = query.populate(populateOptions);
+
+    const docs = await query;
 
     res.status(200).json({
       status: "success",
       results: docs.length,
-      data: {
-        data: docs,
-      },
+      data: { data: docs },
     });
   });
-};
 
 // GET ONE
 exports.getOne = (Model, popOptions) => {

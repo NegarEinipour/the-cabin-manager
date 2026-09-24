@@ -2,6 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("./../utils/AppError");
 const User = require("./../models/userModel");
 const factory = require("../utils/handlerFactory");
+const { uploadImageToSupabase } = require("../utils/uploadToSupabase");
 
 exports.createUser = factory.createOne(User);
 exports.getAllUsers = factory.getAll(User);
@@ -25,27 +26,25 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // console.log("........req.file:", req.file);
-
-  //1. create an erro if the user wants to update the password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError("This route is not for password updates", 400));
   }
 
   const filteredBody = filterObj(req.body, "name", "email");
-  if (req.file) filteredBody.photo = req.file.filename;
 
-  //2. Update the user document
+  if (req.file) {
+    const imageUrl = await uploadImageToSupabase(req.file, "users");
+    filteredBody.photo = imageUrl;
+  }
+
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true, // Return the updated document
-    runValidators: true, // Run schema validation
+    new: true,
+    runValidators: true,
   });
 
   res.status(200).json({
     status: "success",
-    data: {
-      user: updatedUser,
-    },
+    data: { user: updatedUser },
   });
 });
 
@@ -57,3 +56,19 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+const multer = require("multer");
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+exports.uploadUserPhoto = upload.single("photo");

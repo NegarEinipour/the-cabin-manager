@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
+    bookingNumber: {
+      type: Number,
+      unique: true,
+      required: [true, "A booking must have a booking number"],
+    },
     cabin: {
       type: mongoose.Schema.ObjectId,
       ref: "Cabin",

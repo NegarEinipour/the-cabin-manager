@@ -5,8 +5,52 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 
 // CRUD OPERATIONS
-exports.getAllBookings = factory.getAll(Booking);
-exports.getBooking = factory.getOne(Booking);
+
+exports.getAllBookings = catchAsync(async (req, res, next) => {
+  // 1. FILTER
+  const filter = {};
+  if (req.query.status) filter.status = req.query.status;
+
+  // 2. PAGINATION PARAMS
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
+  const skip = (page - 1) * limit;
+
+  // 3. BASE QUERY — now includes skip/limit
+  let query = Booking.find(filter)
+    .populate({ path: "guest", select: "fullName email" })
+    .populate({ path: "cabin", select: "name" })
+    .skip(skip)
+    .limit(limit);
+
+  // 4. SORT
+  if (req.query.sortBy) {
+    const [field, direction] = req.query.sortBy.split("-");
+    const sort = direction === "desc" ? `-${field}` : field;
+    query = query.sort(sort);
+  }
+
+  // 5. EXECUTE — get data and count in parallel
+  const [bookings, total] = await Promise.all([
+    query,
+    Booking.countDocuments(filter),
+  ]);
+
+  // 6. RESPOND
+  res.status(200).json({
+    status: "success",
+    results: bookings.length,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+    data: { data: bookings },
+  });
+});
+
+exports.getBooking = factory.getOne(Booking, [
+  { path: "guest", select: "fullName email" },
+  { path: "cabin", select: "name" },
+]);
 exports.createBooking = factory.createOne(Booking);
 exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
