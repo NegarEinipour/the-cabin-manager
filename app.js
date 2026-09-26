@@ -65,6 +65,7 @@ const corsOptions = {
 
 //MIDDLEWARE
 app.use(cors(corsOptions)); //Enable CORS for all origins
+app.set("query parser", "extended");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

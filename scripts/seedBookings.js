@@ -120,12 +120,16 @@ const seedBookings = async () => {
         hasBreakfast: booking.hasBreakfast,
         isPaid: booking.isPaid,
         observations: booking.observations || "",
+        createdAt: booking.created_at, // ← add this
+        updatedAt: booking.created_at, // ← and this
       });
     }
 
     // Insert bookings
     if (bookingsWithIds.length > 0) {
-      const inserted = await Booking.insertMany(bookingsWithIds);
+      const inserted = await Booking.insertMany(bookingsWithIds, {
+        timestamps: false,
+      });
       console.log(`✅ Successfully imported ${inserted.length} bookings!`);
 
       // Show a sample
