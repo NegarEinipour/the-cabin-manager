@@ -1,8 +1,6 @@
 const catchAsync = require("./catchAsync");
 const AppError = require("./AppError");
-const APIFeatures = require("../utils/apiFeatures");
 
-// GET ALL
 exports.getAll = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     let query = Model.find();
@@ -18,7 +16,6 @@ exports.getAll = (Model, populateOptions) =>
     });
   });
 
-// GET ONE
 exports.getOne = (Model, popOptions) => {
   return catchAsync(async (req, res, next) => {
     let query = Model.findById(req.params.id);
@@ -38,7 +35,6 @@ exports.getOne = (Model, popOptions) => {
   });
 };
 
-// CREATE ONE
 exports.createOne = (Model) => {
   return catchAsync(async (req, res) => {
     const doc = await Model.create(req.body);
@@ -52,27 +48,6 @@ exports.createOne = (Model) => {
   });
 };
 
-// UPDATE ONE
-// exports.updateOne = (Model) => {
-//   return catchAsync(async (req, res, next) => {
-//     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-//       new: true,
-//       runValidators: true,
-//     });
-
-//     if (!doc) {
-//       return next(new AppError("No document found with that ID", 404));
-//     }
-
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         data: doc,
-//       },
-//     });
-//   });
-// };
-// In your handlerFactory.js
 exports.updateOne = (Model) => {
   return catchAsync(async (req, res, next) => {
     const doc = await Model.findById(req.params.id);
@@ -80,12 +55,11 @@ exports.updateOne = (Model) => {
       return next(new AppError("No document found with that ID", 404));
     }
 
-    // Apply updates
     Object.keys(req.body).forEach((key) => {
       doc[key] = req.body[key];
     });
 
-    await doc.save({ runValidators: true }); // ✅ Validation runs correctly
+    await doc.save({ runValidators: true });
 
     res.status(200).json({
       status: "success",
@@ -96,7 +70,6 @@ exports.updateOne = (Model) => {
   });
 };
 
-// DELETE ONE
 exports.deleteOne = (Model) => {
   return catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id);

@@ -78,19 +78,15 @@ const bookingSchema = new mongoose.Schema(
   },
 );
 
-// INDEXES
 bookingSchema.index({ cabin: 1, startDate: 1 });
 bookingSchema.index({ guest: 1 });
 bookingSchema.index({ status: 1 });
 
-// VIRTUAL: Duration in weeks
 bookingSchema.virtual("durationWeeks").get(function () {
   return this.numNights / 7;
 });
 
-// PRE-SAVE: Calculate totalPrice
 bookingSchema.pre("save", function () {
-  // Calculate total price based on cabin price, nights, and extras
   this.totalPrice = this.cabinPrice * this.numNights + (this.extrasPrice || 0);
 });
 

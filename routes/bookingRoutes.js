@@ -19,8 +19,4 @@ router
   .patch(bookingController.updateBooking)
   .delete(bookingController.deleteBooking);
 
-// Check-in / Check-out
-router.patch("/:id/checkin", bookingController.checkIn);
-router.patch("/:id/checkout", bookingController.checkOut);
-
 module.exports = router;

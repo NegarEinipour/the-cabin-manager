@@ -28,9 +28,8 @@ const cabinSchema = new mongoose.Schema(
       max: [100, "Discount cannot exceed 100%"],
       validate: {
         validator: function (val) {
-          // Check if regularPrice exists
           if (this.regularPrice === undefined) {
-            return true; // Skip validation if regularPrice is not set
+            return true;
           }
           return val < this.regularPrice;
         },
@@ -68,7 +67,6 @@ const cabinSchema = new mongoose.Schema(
   },
 );
 
-// Virtual property: discounted price
 cabinSchema.virtual("discountedPrice").get(function () {
   if (this.discount > 0) {
     return this.regularPrice - this.discount;
@@ -76,14 +74,12 @@ cabinSchema.virtual("discountedPrice").get(function () {
   return this.regularPrice;
 });
 
-// Virtual populate: bookings for this cabin
 cabinSchema.virtual("bookings", {
   ref: "Booking",
   foreignField: "cabin",
   localField: "_id",
 });
 
-// Index for faster queries
 cabinSchema.index({ name: 1 });
 cabinSchema.index({ isAvailable: 1 });
 cabinSchema.index({ regularPrice: 1 });

@@ -45,7 +45,6 @@ const sendErrorProd = (err, req, res) => {
         message: err.message,
       });
     }
-    console.error("ERROR 💥", err);
     return res.status(500).json({
       status: "error",
       message: "Something went wrong",
@@ -59,7 +58,6 @@ const sendErrorProd = (err, req, res) => {
     });
   }
 
-  console.error("ERROR 💥", err);
   return res.status(500).render("error", {
     title: "Something went wrong",
     msg: "Please try again later",

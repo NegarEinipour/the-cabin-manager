@@ -6,7 +6,7 @@ const settingsSchema = new mongoose.Schema(
     // ─── HOTEL INFO ───
     hotelName: {
       type: String,
-      default: "The Wild Oasis",
+      default: "The Cabin Manager",
     },
     hotelAddress: {
       type: String,
@@ -14,11 +14,11 @@ const settingsSchema = new mongoose.Schema(
     },
     hotelPhone: {
       type: String,
-      default: "+1-800-WILD-OASIS",
+      default: "+1-800-CABIN-MANAGER",
     },
     hotelEmail: {
       type: String,
-      default: "info@wildoasis.com",
+      default: "info@cabinmanager.com",
     },
 
     // ─── BOOKING RULES ───

@@ -1,7 +1,7 @@
 {
-  "name": "the-wild-oasis-backend",
+  "name": "cabin-manager-backend",
   "version": "1.0.0",
-  "description": "Wild Oasis Backend API",
+  "description": "Cabin Manager Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

@@ -15,13 +15,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Provide your email"],
       unique: true,
-      lowercase: true, //transform the email to lowercase
+      lowercase: true,
       validate: [validator.isEmail, "Provide a valid email"],
     },
     photo: {
       type: String,
       default: "default.jpg",
-    }, //path to a photo
+    },
     password: {
       type: String,
       required: [true, "provide a password"],
@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema(
     passwordConfirm: {
       type: String,
       required: [true, " confirm your password"],
-      //THIS ONLY WORKS ON CREATE & SAVE
       validate: {
         validator: function (el) {
           return el === this.password;
@@ -60,37 +59,27 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-//PRE-SAVE MIDDLEWARE - HASH PASSWORD
 userSchema.pre("save", async function () {
-  // 1. Only run if password is modified
   if (!this.isModified("password")) {
-    return; //return to exit early
+    return;
   }
-  // 2. Hash the password
   this.password = await bcrypt.hash(this.password, 12);
 
-  // 3. Remove passwordConfirm (not stored in DB)
   this.passwordConfirm = undefined;
 });
 
-//PRE-SAVE MIDDLEWARE - PASSWORD CHANGED AT
 userSchema.pre("save", async function () {
-  // 1. Only run if password is modified AND user is not new
   if (!this.isModified("password") || this.isNew) {
     return;
   }
 
-  // 2. Set passwordChangedAt (subtract 1 second to be safe)
   this.passwordChangedAt = Date.now() - 1000;
 });
 
-//QUERY MIDDLEWARE - EXLUDE INACTIVE USERS
 userSchema.pre(/^find/, function (next) {
-  // This runs on all find queries (find, findOne, findById, etc.)
   this.find({ active: { $ne: false } });
 });
 
-//INSTANCE METHOD - COMPARE PASSWORDS
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
@@ -98,33 +87,27 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-//INSTANCE METHOD - CHECKS IF THE THE PASSWORD HAS CHANGED
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000, //Convert the date to seconds from miliseconds
-      10, //Convert to a number
+      this.passwordChangedAt.getTime() / 1000,
+      10,
     );
-    return JWTTimestamp < changedTimestamp; //Check if token was issued BEFORE password change
+    return JWTTimestamp < changedTimestamp;
   }
   return false;
 };
 
-//INSTANCE METHOD - CREATE  PASSWORD RESET TOKEN
 userSchema.methods.createPasswordResetToken = function () {
-  // 1. Generate a random token
-  const resetToken = crypto.randomBytes(32).toString("hex"); //	Generates 32 random bytes then Converts it to a readable hex string
+  const resetToken = crypto.randomBytes(32).toString("hex");
 
-  // 2. Hash the token and store it in the database
   this.passwordResetToken = crypto
-    .createHash("sha256") //Creates a SHA-256 hashing algorithm
-    .update(resetToken) //Feeds the token into the hash
-    .digest("hex"); //Converts the hash to a hexadecimal string
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
-  // 3. Set expiration (10 minutes)
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; //Adds 10 minutes (10 × 60 seconds × 1000 ms)
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
-  // 4. Return the un-hashed token (to send to user via email)
   return resetToken;
 };
 
