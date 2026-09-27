@@ -3,3 +3,4 @@ config.env
 .env
 *.log
 .DS_Store
+dev-data/data/users.js
