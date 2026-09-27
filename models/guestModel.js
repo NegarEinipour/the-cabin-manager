@@ -21,6 +21,7 @@ const guestSchema = new mongoose.Schema(
       type: String,
       default: "Unknown",
     },
+    countryFlag: { type: String },
     phone: {
       type: String,
       default: "",

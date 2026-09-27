@@ -25,6 +25,7 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
   });
   // console.log("QUERY:", JSON.stringify(req.query, null, 2));
   // console.log("FILTER:", JSON.stringify(filter, null, 2));
+
   // 3. PAGINATION PARAMS
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 10));
@@ -70,6 +71,28 @@ exports.getBooking = factory.getOne(Booking, [
 exports.createBooking = factory.createOne(Booking);
 exports.updateBooking = factory.updateOne(Booking);
 exports.deleteBooking = factory.deleteOne(Booking);
+
+exports.getTodayActivity = catchAsync(async (req, res, next) => {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const bookings = await Booking.find({
+    status: { $in: ["unconfirmed", "checked-in"] },
+    startDate: { $lte: todayEnd },
+    endDate: { $gte: todayStart },
+  })
+    .populate({ path: "guest", select: "fullName nationality countryFlag" })
+    .sort("startDate");
+
+  res.status(200).json({
+    status: "success",
+    results: bookings.length,
+    data: { data: bookings },
+  });
+});
 
 // CHECK-IN / CHECK-OUT
 exports.checkIn = catchAsync(async (req, res, next) => {

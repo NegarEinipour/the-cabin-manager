@@ -205,7 +205,7 @@ module.exports = [
       "We will be checking in late, around midnight. Hope that's okay :)",
     isPaid: true,
     numGuests: 6,
-    status: "checked-in",
+    status: "unconfirmed",
   },
   {
     created_at: fromToday(-16, true),

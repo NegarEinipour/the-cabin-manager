@@ -6,6 +6,8 @@ const authController = require("../controllers/authController");
 
 router.use(authController.protect);
 
+router.route("/today-activity").get(bookingController.getTodayActivity);
+
 router
   .route("/")
   .get(bookingController.getAllBookings)
