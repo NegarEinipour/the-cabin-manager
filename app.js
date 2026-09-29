@@ -82,6 +82,10 @@ app.use("/api/v1/guests", guestRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/settings", settingsRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.all("/*splat", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
