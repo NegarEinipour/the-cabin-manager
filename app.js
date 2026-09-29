@@ -45,7 +45,7 @@ app.locals.uploadCabinImage = uploadCabinImage;
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? "https://your-production-domain.com"
+      ? "https://the-cabin-manager-frontend.pages.dev"
       : "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
