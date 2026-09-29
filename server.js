@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 
 mongoose
-  .connect(process.env.DATABASE_LOCAL)
+  .connect(process.env.DATABASE_ATLAS)
   .then(() => {})
   .catch((err) => {});
 

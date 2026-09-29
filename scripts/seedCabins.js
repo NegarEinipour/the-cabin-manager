@@ -38,7 +38,7 @@ const uploadImageToSupabase = async (imagePath, imageName) => {
 
 const seedDatabase = async () => {
   try {
-    await mongoose.connect(process.env.DATABASE_LOCAL);
+    await mongoose.connect(process.env.DATABASE_ATLAS);
 
     await Cabin.deleteMany();
 

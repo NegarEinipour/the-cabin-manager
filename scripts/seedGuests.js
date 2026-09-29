@@ -8,7 +8,7 @@ dotenv.config({ path: path.join(__dirname, "../config.env") });
 
 const seedGuests = async () => {
   try {
-    await mongoose.connect(process.env.DATABASE_LOCAL);
+    await mongoose.connect(process.env.DATABASE_ATLAS);
 
     await Guest.deleteMany();
 
