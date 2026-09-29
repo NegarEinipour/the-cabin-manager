@@ -42,15 +42,33 @@ const uploadCabinImage = upload.single("image");
 
 app.locals.uploadCabinImage = uploadCabinImage;
 
+// const corsOptions = {
+//   origin:
+//     process.env.NODE_ENV === "production"
+//       ? "https://the-cabin-manager-frontend.pages.dev"
+//       : "http://localhost:5173",
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   optionsSuccessStatus: 200,
+// };
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://the-cabin-manager-frontend.pages.dev",
+];
+
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? "https://the-cabin-manager-frontend.pages.dev"
-      : "http://localhost:5173",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
